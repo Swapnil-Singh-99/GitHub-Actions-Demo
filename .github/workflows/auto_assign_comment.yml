@@ -1,0 +1,25 @@
+name: Auto Assign
+
+on:
+  issues:
+    types:
+      - assigned
+
+jobs:
+  send_assignment_comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get assignee username
+        id: get_assignee
+        run: echo "::set-output name=assignee::${{ github.event.issue.assignee.login }}"
+        
+      - name: Send Assignment Comment
+        run: |
+          ASSIGNER=$(echo ${{ github.event.sender.login }})
+          ASSIGNMENT_COMMENT="Hello @$ASSIGNEE! This issue has been assigned to you."
+          echo "$ASSIGNMENT_COMMENT"
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments \
+            -d "{\"body\": \"$ASSIGNMENT_COMMENT\"}"
