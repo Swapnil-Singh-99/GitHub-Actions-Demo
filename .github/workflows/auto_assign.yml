@@ -10,14 +10,18 @@ jobs:
     steps:
       - name: Check for issue assign command
         id: check_assign
-        run: echo "::set-output name=assign::$(echo ${{ github.event.comment.body }} | grep -o '/assign')"
-        
-      - name: Assign Issue
-        if: steps.check_assign.outputs.assign
-        run: |
-          # Extract the commenter's username from the comment
-          USER=$(echo ${{ github.event.comment.user.login }})
+        run: echo ${{ github.event.comment.body }} > comment.txt
 
-          # Assign the issue to the commenter
+      - name: Read comment file
+        id: read_comment
+        run: |
+          COMMENT=$(cat comment.txt)
+          echo "Comment: $COMMENT"
+          echo "::set-output name=comment::$COMMENT"
+
+      - name: Assign Issue
+        if: startsWith(steps.read_comment.outputs.comment, '/assign')
+        run: |
+          USER=$(echo ${{ github.event.comment.user.login }})
           echo "Assigning issue to @$USER"
           gh issue assign $USER
