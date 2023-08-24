@@ -31,8 +31,8 @@ jobs:
             if (issueNumber) {
               const commenter = context.payload.comment.user.login;
               const config = {
-                owner: 'avinashkranjan',
-                repo: 'Amazing-Python-Scripts',
+                owner: 'Swapnil-Singh-99',
+                repo: 'PythonScriptsHub',
                 issue_number: issueNumber,
                 assignees: [commenter]
               };
