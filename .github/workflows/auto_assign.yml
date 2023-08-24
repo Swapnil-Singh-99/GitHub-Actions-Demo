@@ -1,0 +1,29 @@
+name: Auto Assign
+
+on:
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check for /assign command
+      id: check_command
+      run: echo "::set-output name=assign::$(echo ${{ github.event.comment.body }} | grep -c '/assign')"
+      
+    - name: Assign Issue
+      if: steps.check_command.outputs.assign == '1'
+      run: |
+        # Extract username from comment
+        USER=$(echo ${{ github.event.comment.body }} | grep -oE '@[[:alnum:]]+' | head -n1)
+        
+        # Remove '@' to get the username
+        USER=${USER:1}
+        
+        # Assign the issue
+        echo "Assigning issue to @$USER"
+        gh issue assign $USER
+
